@@ -1,0 +1,161 @@
+{
+  "scanner": "LightweightLabScanner",
+  "version": "1.0",
+  "target": "http://127.0.0.1:18080/",
+  "scanned_at": "2026-10-28T04:54:21.256555+00:00",
+  "status": "complete",
+  "pages_crawled": 13,
+  "pages": [
+    "http://127.0.0.1:18080/",
+    "http://127.0.0.1:18080/cart.html",
+    "http://127.0.0.1:18080/index.html",
+    "http://127.0.0.1:18080/login.html",
+    "http://127.0.0.1:18080/orders.html",
+    "http://127.0.0.1:18080/products.html",
+    "http://127.0.0.1:18080/products.html?search=%3Cscript%3Ealert(document.domain)%3C%2Fscript%3E",
+    "http://127.0.0.1:18080/profile.html",
+    "http://127.0.0.1:18080/profile.html?id=1",
+    "http://127.0.0.1:18080/profile.html?id=2",
+    "http://127.0.0.1:18080/profile.html?id=3",
+    "http://127.0.0.1:18080/register.html",
+    "http://127.0.0.1:18080/search?q=%3Cscript%3Ealert(document.domain)%3C/script%3E"
+  ],
+  "request_errors": [],
+  "forms": [
+    {
+      "action": "/products.html",
+      "method": "get",
+      "inputs": [
+        "search"
+      ],
+      "page": "http://127.0.0.1:18080/"
+    },
+    {
+      "action": "/products.html",
+      "method": "get",
+      "inputs": [
+        "search"
+      ],
+      "page": "http://127.0.0.1:18080/index.html"
+    },
+    {
+      "action": "",
+      "method": "get",
+      "inputs": [
+        ""
+      ],
+      "page": "http://127.0.0.1:18080/products.html"
+    },
+    {
+      "action": "",
+      "method": "get",
+      "inputs": [
+        "",
+        ""
+      ],
+      "page": "http://127.0.0.1:18080/login.html"
+    },
+    {
+      "action": "",
+      "method": "get",
+      "inputs": [
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "page": "http://127.0.0.1:18080/register.html"
+    },
+    {
+      "action": "",
+      "method": "get",
+      "inputs": [
+        ""
+      ],
+      "page": "http://127.0.0.1:18080/cart.html"
+    },
+    {
+      "action": "",
+      "method": "get",
+      "inputs": [
+        ""
+      ],
+      "page": "http://127.0.0.1:18080/products.html?search=%3Cscript%3Ealert(document.domain)%3C%2Fscript%3E"
+    }
+  ],
+  "parameters": [
+    {
+      "url": "http://127.0.0.1:18080/profile.html?id=3",
+      "name": "id",
+      "value": "3"
+    },
+    {
+      "url": "http://127.0.0.1:18080/search?q=%3Cscript%3Ealert(document.domain)%3C/script%3E",
+      "name": "q",
+      "value": "<script>alert(document.domain)</script>"
+    },
+    {
+      "url": "http://127.0.0.1:18080/profile.html?id=2",
+      "name": "id",
+      "value": "2"
+    },
+    {
+      "url": "http://127.0.0.1:18080/profile.html?id=1",
+      "name": "id",
+      "value": "1"
+    },
+    {
+      "url": "http://127.0.0.1:18080/products.html?search=%3Cscript%3Ealert(document.domain)%3C%2Fscript%3E",
+      "name": "search",
+      "value": "<script>alert(document.domain)</script>"
+    }
+  ],
+  "findings": [
+    {
+      "id": "HDR-CSP",
+      "title": "Missing Content-Security-Policy",
+      "severity": "medium",
+      "owasp": "A05 Security Misconfiguration",
+      "url": "http://127.0.0.1:18080/",
+      "evidence": "content-security-policy response header absent",
+      "recommendation": "Set a restrictive content-security-policy response header."
+    },
+    {
+      "id": "HDR-NOSNIFF",
+      "title": "Missing X-Content-Type-Options",
+      "severity": "medium",
+      "owasp": "A05 Security Misconfiguration",
+      "url": "http://127.0.0.1:18080/",
+      "evidence": "x-content-type-options response header absent",
+      "recommendation": "Set a restrictive x-content-type-options response header."
+    },
+    {
+      "id": "HDR-XFO",
+      "title": "Missing X-Frame-Options",
+      "severity": "medium",
+      "owasp": "A05 Security Misconfiguration",
+      "url": "http://127.0.0.1:18080/",
+      "evidence": "x-frame-options response header absent",
+      "recommendation": "Set a restrictive x-frame-options response header."
+    },
+    {
+      "id": "TLS-001",
+      "title": "Site served over unencrypted HTTP",
+      "severity": "medium",
+      "owasp": "A02 Cryptographic Failures",
+      "url": "http://127.0.0.1:18080/",
+      "evidence": "URL scheme is http",
+      "recommendation": "Serve the application over HTTPS and redirect HTTP to HTTPS."
+    },
+    {
+      "id": "XSS-REFLECT",
+      "title": "Reflected marker observed; review output encoding",
+      "severity": "low",
+      "owasp": "A03 Injection",
+      "url": "http://127.0.0.1:18080/search?q=LVSXSS7f31a",
+      "evidence": "Unique harmless marker returned in response; reflection alone does not prove script execution",
+      "recommendation": "Contextually encode untrusted output and use safe DOM APIs."
+    }
+  ]
+}

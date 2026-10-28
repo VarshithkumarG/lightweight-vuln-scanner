@@ -69,4 +69,3 @@ python -m unittest discover -s tests -v
 - `build_report.py` — rebuilds the project report PDF
 
 The included sample reports are completed unauthenticated scans of vulnerable local lab profiles. Flask SecureShop was scanned at `127.0.0.1:5000` (8 pages, 5 findings); Node SecureShop was scanned at `127.0.0.1:18080` (13 pages, 5 findings) because its default port was occupied during the scan. Review each finding and evidence before using the results in an assessment.
-

@@ -1,0 +1,60 @@
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
+from reportlab.graphics.shapes import Drawing, Rect, String, Line
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+from pathlib import Path
+
+out=Path('reports/project-report.pdf')
+doc=SimpleDocTemplate(str(out),pagesize=A4,rightMargin=17*mm,leftMargin=17*mm,topMargin=15*mm,bottomMargin=15*mm,title='Lightweight Web Vulnerability Scanner Report',author='Application Security Student')
+styles=getSampleStyleSheet()
+styles.add(ParagraphStyle(name='Title2',parent=styles['Title'],fontName='Helvetica-Bold',fontSize=21,leading=25,textColor=colors.HexColor('#12304a'),alignment=TA_CENTER,spaceAfter=5))
+styles.add(ParagraphStyle(name='Sub',parent=styles['Normal'],fontSize=9,leading=13,textColor=colors.HexColor('#46596b'),alignment=TA_CENTER,spaceAfter=13))
+styles.add(ParagraphStyle(name='H',parent=styles['Heading2'],fontName='Helvetica-Bold',fontSize=13,leading=16,textColor=colors.HexColor('#12304a'),spaceBefore=5,spaceAfter=6))
+styles.add(ParagraphStyle(name='Body2',parent=styles['BodyText'],fontSize=8.7,leading=12,spaceAfter=5))
+styles.add(ParagraphStyle(name='Small',parent=styles['BodyText'],fontSize=7.2,leading=9))
+styles.add(ParagraphStyle(name='Cell',parent=styles['BodyText'],fontSize=7.2,leading=9))
+P=lambda t,s='Body2':Paragraph(t,styles[s])
+flow=[]
+flow += [P('Lightweight Web Vulnerability Scanner','Title2'),P('Design, safety controls, detection coverage, and validation status','Sub')]
+flow += [P('Purpose and scope','H'),P('This project implements a small Python command-line scanner for authorised localhost web labs. It crawls same-origin pages, records links, forms and query parameters, runs passive configuration checks and narrowly scoped harmless GET probes, and writes console and JSON results. The assignment requires a consent gate, safe request pacing, a page limit, timeouts, a clear User-Agent, 10 or more checks across at least six OWASP categories, unit tests, and scan evidence for two lab targets.')]
+flow += [P('Architecture','H')]
+d=Drawing(500,112)
+boxes=[(5,35,110,52,'CLI / consent gate'),(135,35,110,52,'Loopback boundary\n+ paced GET client'),(265,35,105,52,'Same-origin crawler\nlinks / forms / params'),(390,35,105,52,'Check modules\npassive + benign probes')]
+for x,y,w,h,label in boxes:
+ d.add(Rect(x,y,w,h,rx=7,ry=7,fillColor=colors.HexColor('#eaf2f7'),strokeColor=colors.HexColor('#45718e'),strokeWidth=1.2));
+ for j,line in enumerate(label.split('\n')): d.add(String(x+7,y+31-j*14,line,fontName='Helvetica',fontSize=8,fillColor=colors.HexColor('#12304a')))
+for x1,x2 in [(115,135),(245,265),(370,390)]: d.add(Line(x1,61,x2,61,strokeColor=colors.HexColor('#456'),strokeWidth=1.5)); d.add(String(x2-7,65,'>',fontSize=8))
+d.add(Rect(182,5,140,19,rx=4,ry=4,fillColor=colors.HexColor('#f5f7fa'),strokeColor=colors.HexColor('#8798a6'))); d.add(String(193,11,'Console summary + JSON report',fontSize=8)); d.add(Line(443,34,300,24,strokeColor=colors.HexColor('#8798a6')))
+flow += [d,Spacer(1,4),P('Safety controls','H'),P('The scanner refuses execution without <b>--i-have-permission</b> and accepts only literal loopback IP addresses. All requests use GET with redirects disabled, a 250 ms default delay, an 8-second timeout and a 30-page cap. Form submissions are never sent. The reflected marker is unique text, and SQL probing is a single quote matched against database-specific error signatures. File probes require content signatures, not status code alone.','Body2'),P('Current execution status','H'),P('Both sample targets were the workspace’s local vulnerable SecureShop labs. Flask ran at 127.0.0.1:5000; Node/Express ran at 127.0.0.1:18080 because its default port was occupied. Both scans completed without connection errors. These are indicators from an unauthenticated crawl, not a complete assessment.','Body2'),PageBreak()]
+flow += [P('Check coverage and OWASP mapping','H'),P('The implementation includes the following detection modules. A finding is an indicator that needs human confirmation; the scanner does not assert exploitability.','Body2')]
+rows=[[P('<b>Check</b>','Cell'),P('<b>OWASP</b>','Cell'),P('<b>Evidence / confidence limit</b>','Cell')]]
+data=[('HTTP instead of HTTPS; missing HSTS','A02','Scheme and header inspection; HSTS is relevant only over HTTPS.'),('Cookie Secure flag','A02','Cookie attribute check on HTTPS responses.'),('Missing CSP, X-Frame-Options, nosniff','A05','Response header absence.'),('Directory listing','A05','Known directory-index title signature.'),('Exposed .env, .git/HEAD, phpinfo','A05','GET path probes require characteristic content.'),('SQL error after quote probe','A03','Database error text; may miss blind or suppressed errors.'),('Reflected harmless marker','A03','Unique marker reflected in HTML; reflection alone does not prove execution.'),('Server version disclosure','A06','Banner is an inventory signal, not a CVE match.'),('HttpOnly and SameSite cookie flags','A07','Set-Cookie attribute inspection.'),('External script without SRI','A08','External script tag lacks integrity attribute.'),('Potential tokenless state-changing form','A01','Passive field-name heuristic; does not submit form.'),('Permissive CORS; mixed content','A01 / A02','Header policy and insecure resource reference inspection.')]
+for a,b,c in data: rows.append([P(a,'Cell'),P(b,'Cell'),P(c,'Cell')])
+t=Table(rows,colWidths=[53*mm,29*mm,93*mm],repeatRows=1)
+t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#dce8f0')),('TEXTCOLOR',(0,0),(-1,0),colors.HexColor('#12304a')),('GRID',(0,0),(-1,-1),.35,colors.HexColor('#bdc8d0')),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),5),('RIGHTPADDING',(0,0),(-1,-1),5),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#f6f8fa')])]))
+flow += [t,Spacer(1,7),P('The scanner covers A01, A02, A03, A05, A06, A07 and A08. A09 (Security Logging and Monitoring Failures) and A10 (Server-Side Request Forgery) are not tested remotely. Outdated dependencies require a package inventory and advisory database; a version banner alone is insufficient.','Body2'),PageBreak()]
+flow += [P('Sample scan outcomes and accuracy','H'),P('Both JSON reports were generated from completed scans of vulnerable localhost lab applications. Findings cover only pages reachable without authentication and require manual review.','Body2')]
+result_rows=[[P('<b>Lab target</b>','Cell'),P('<b>Pages</b>','Cell'),P('<b>Findings</b>','Cell'),P('<b>Observed indicators</b>','Cell')],
+[P('Flask SecureShop<br/>127.0.0.1:5000','Cell'),P('8','Cell'),P('5: 4 medium, 1 low','Cell'),P('HTTP; missing CSP, X-Frame-Options and nosniff; version banner.','Cell')],
+[P('Node SecureShop<br/>127.0.0.1:18080','Cell'),P('13','Cell'),P('5: 4 medium, 1 low','Cell'),P('HTTP; missing CSP, X-Frame-Options and nosniff; reflected marker.','Cell')]]
+rt=Table(result_rows,colWidths=[42*mm,16*mm,31*mm,86*mm],repeatRows=1)
+rt.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#dce8f0')),('GRID',(0,0),(-1,-1),.35,colors.HexColor('#bdc8d0')),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),5),('RIGHTPADDING',(0,0),(-1,-1),5),('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#f6f8fa')])]))
+flow += [rt,Spacer(1,5),P('Both reports have status <b>complete</b>. Missing headers and version disclosure are configuration evidence; the reflected-marker alert is low confidence and does not demonstrate script execution. Neither scan found an exposed-file signature or database error.','Body2')]
+flow += [P('Known limitations observed in this run','H'),P('An earlier Flask manual validation record reports an HttpOnly-missing session cookie, SQL-injection behavior on product search, and cross-account order/profile exposure. This scanner did not detect those: its crawl was unauthenticated, no session cookie was set on the visited public pages, and its quote request did not return a recognized database error. The Node lab documentation describes an old lodash pin, but this scanner does not inventory dependencies or query CVE databases. These are known blind spots, not contradictions.')]
+flow += [P('False positives and false negatives','H'),P('<b>False positives:</b> A missing token-like field name does not prove CSRF vulnerability because tokens may be supplied through headers or framework middleware. Version banners can be stale or backported. Generic SQL error wording can arise from application handling. CORS wildcard is not automatically exploitable for credentialed requests. An external script without SRI may be intentionally controlled by the application. Findings are deduplicated by check ID and URL and include bounded evidence for review.')]
+flow += [P('<b>False negatives:</b> Page limits and link-only crawling miss unlinked and authenticated routes. HTML parsing does not run JavaScript. One marker and one quote miss encoded, stored, DOM-based, blind and context-specific injection. GET probes cannot discover state-dependent access-control defects, SSRF or business-logic flaws. Redirects are not followed, some content types are skipped, and response limits can truncate evidence. These limits should be reported with every scan.','Body2'),PageBreak()]
+flow += [P('Remediation and demo plan','H'),P('Recommended fixes','H')]
+for x in ['Serve all pages over HTTPS; add HSTS after validating HTTPS deployment and set Secure, HttpOnly and appropriate SameSite cookie attributes.','Set a restrictive Content-Security-Policy, frame-ancestors or X-Frame-Options, and X-Content-Type-Options: nosniff. Disable directory indexing and remove/block development files such as .env, .git and phpinfo.','Use parameterized SQL and context-aware output encoding; do not treat a scanner marker response as proof of script execution.','Allowlist CORS origins, add CSRF middleware to state-changing actions, pin and update dependencies, and remove unnecessary server version banners.','Review every alert against application behavior and compare with an OWASP ZAP baseline scan on the same lab profile. Record tool versions, scan date, mode, paths and confirmed/false-positive status.']:
+ flow.append(P('• '+x))
+flow += [P('Five-minute demonstration','H'),P('1. Start each intentionally vulnerable app on its documented loopback address. 2. Show that invocation without the permission flag is rejected and a remote hostname is refused. 3. Scan the Flask lab with a small page cap and explain request delay, evidence and JSON output. 4. Run the Node lab and compare findings. 5. Discuss one confirmed header or cookie issue, one potential false positive, and what the tool cannot test. Use only labs you are authorised to assess.')]
+flow += [P('Local rerun commands','H'),P('<font name="Courier">python scanner.py http://127.0.0.1:5000 --i-have-permission -o reports/secureshop-flask.json</font><br/><font name="Courier">python scanner.py http://127.0.0.1:18080 --i-have-permission -o reports/secureshop-node.json</font>')]
+flow += [Spacer(1,6),P('Project files: scanner.py, README.md, requirements.txt, tests/test_scanner.py, and reports/. Unit tests cover header checks, cookie flags, SQL error signatures, and loopback enforcement.','Small')]
+def footer(canvas,doc):
+ canvas.saveState(); canvas.setFont('Helvetica',7); canvas.setFillColor(colors.HexColor('#71808d')); canvas.drawString(17*mm,9*mm,'Lightweight Web Vulnerability Scanner | localhost lab only'); canvas.drawRightString(A4[0]-17*mm,9*mm,str(doc.page)); canvas.restoreState()
+doc.build(flow,onFirstPage=footer,onLaterPages=footer)
+print(out.resolve())

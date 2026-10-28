@@ -1,0 +1,134 @@
+{
+  "scanner": "LightweightLabScanner",
+  "version": "1.0",
+  "target": "http://127.0.0.1:5000/",
+  "scanned_at": "2026-10-28T04:54:14.780784+00:00",
+  "status": "complete",
+  "pages_crawled": 8,
+  "pages": [
+    "http://127.0.0.1:5000/",
+    "http://127.0.0.1:5000/login",
+    "http://127.0.0.1:5000/products",
+    "http://127.0.0.1:5000/products/1",
+    "http://127.0.0.1:5000/products/2",
+    "http://127.0.0.1:5000/products/3",
+    "http://127.0.0.1:5000/products/4",
+    "http://127.0.0.1:5000/register"
+  ],
+  "request_errors": [],
+  "forms": [
+    {
+      "action": "",
+      "method": "get",
+      "inputs": [
+        "q"
+      ],
+      "page": "http://127.0.0.1:5000/products"
+    },
+    {
+      "action": "",
+      "method": "post",
+      "inputs": [
+        "csrf_token",
+        "email",
+        "password"
+      ],
+      "page": "http://127.0.0.1:5000/login"
+    },
+    {
+      "action": "",
+      "method": "post",
+      "inputs": [
+        "csrf_token",
+        "name",
+        "email",
+        "password"
+      ],
+      "page": "http://127.0.0.1:5000/register"
+    },
+    {
+      "action": "/cart",
+      "method": "post",
+      "inputs": [
+        "csrf_token",
+        "product_id"
+      ],
+      "page": "http://127.0.0.1:5000/products/1"
+    },
+    {
+      "action": "/cart",
+      "method": "post",
+      "inputs": [
+        "csrf_token",
+        "product_id"
+      ],
+      "page": "http://127.0.0.1:5000/products/2"
+    },
+    {
+      "action": "/cart",
+      "method": "post",
+      "inputs": [
+        "csrf_token",
+        "product_id"
+      ],
+      "page": "http://127.0.0.1:5000/products/3"
+    },
+    {
+      "action": "/cart",
+      "method": "post",
+      "inputs": [
+        "csrf_token",
+        "product_id"
+      ],
+      "page": "http://127.0.0.1:5000/products/4"
+    }
+  ],
+  "parameters": [],
+  "findings": [
+    {
+      "id": "HDR-CSP",
+      "title": "Missing Content-Security-Policy",
+      "severity": "medium",
+      "owasp": "A05 Security Misconfiguration",
+      "url": "http://127.0.0.1:5000/",
+      "evidence": "content-security-policy response header absent",
+      "recommendation": "Set a restrictive content-security-policy response header."
+    },
+    {
+      "id": "HDR-NOSNIFF",
+      "title": "Missing X-Content-Type-Options",
+      "severity": "medium",
+      "owasp": "A05 Security Misconfiguration",
+      "url": "http://127.0.0.1:5000/",
+      "evidence": "x-content-type-options response header absent",
+      "recommendation": "Set a restrictive x-content-type-options response header."
+    },
+    {
+      "id": "HDR-XFO",
+      "title": "Missing X-Frame-Options",
+      "severity": "medium",
+      "owasp": "A05 Security Misconfiguration",
+      "url": "http://127.0.0.1:5000/",
+      "evidence": "x-frame-options response header absent",
+      "recommendation": "Set a restrictive x-frame-options response header."
+    },
+    {
+      "id": "TLS-001",
+      "title": "Site served over unencrypted HTTP",
+      "severity": "medium",
+      "owasp": "A02 Cryptographic Failures",
+      "url": "http://127.0.0.1:5000/",
+      "evidence": "URL scheme is http",
+      "recommendation": "Serve the application over HTTPS and redirect HTTP to HTTPS."
+    },
+    {
+      "id": "INFO-VERSION",
+      "title": "Server technology version disclosed",
+      "severity": "low",
+      "owasp": "A06 Vulnerable and Outdated Components",
+      "url": "http://127.0.0.1:5000/",
+      "evidence": "Werkzeug/3.1.9 Python/3.10.0 SecureShop-Training/0.1",
+      "recommendation": "Remove unnecessary version banners and maintain supported dependencies."
+    }
+  ]
+}
